@@ -13,7 +13,7 @@ namespace Player_v_Player_Game.Data
             PlayerPrefs.Save();
         }
 
-        public static Gamedata LoadGameData()
+        public static GameData LoadGameData()
         {
             if (PlayerPrefs.HasKey(dataKey))
             {
@@ -22,7 +22,7 @@ namespace Player_v_Player_Game.Data
             }
             else
             {
-                return new Gamedata();
+                return new GameData();
             }
         }
     }

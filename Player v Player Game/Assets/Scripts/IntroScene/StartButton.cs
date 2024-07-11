@@ -8,7 +8,7 @@ namespace Player_v_Player_Game.IntroScene
     {
         public void OnStartButtonClick()
         {
-            SceneManager.LoadScene("MainScene");
+            SceneManager.LoadScene("MainMenuScene");
         }
     }
 }

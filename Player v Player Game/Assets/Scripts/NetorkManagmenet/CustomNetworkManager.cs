@@ -6,14 +6,11 @@ using Mirror;
 
 public class CustomNetworkManager : NetworkManager
 {
-    public GameObject lobbyUI;
-    public GameObject roomUI;
     public Text roomCodeText;
 
-    public override void Start()
+    public void StartServer1()
     {
-        base.Start();
-        networkAddress = "localhost";
+        StartServer(); // This starts the server using Mirror's NetworkManager method
     }
     // Override to customize player object spawning
     public void OnServerAddPlayer(NetworkConnection conn)
@@ -24,8 +21,8 @@ public class CustomNetworkManager : NetworkManager
         // Ensure the player object is spawned on the server for the specific connection
         NetworkServer.Spawn(player, conn);
     }
-        // Method to create a new game room with a code
-        public void CreateGameRoom()
+    // Method to create a new game room with a code
+    public void CreateGameRoom()
     {
         string roomCode = GenerateRoomCode(); // Generate a room code
         roomCodeText.text = roomCode; // Display room code
@@ -33,8 +30,6 @@ public class CustomNetworkManager : NetworkManager
         // Optionally, you can create a room-specific object or perform other setup
         // GameObject room = Instantiate(roomPrefab);
         // NetworkServer.Spawn(room);
-
-        ShowRoomUI(true); // Show room UI
     }
 
     // Method to join an existing game room with a code
@@ -63,17 +58,5 @@ public class CustomNetworkManager : NetworkManager
             code[i] = chars[Random.Range(0, chars.Length)];
         }
         return new string(code);
-    }
-
-    // Method to show or hide lobby UI
-    public void ShowLobbyUI(bool show)
-    {
-        lobbyUI.SetActive(show);
-    }
-
-    // Method to show or hide room UI
-    public void ShowRoomUI(bool show)
-    {
-        roomUI.SetActive(show);
     }
 }

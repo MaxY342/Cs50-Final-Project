@@ -5,8 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class LocalActivityButton : MonoBehaviour
 {
-    public void LoadScene(string LocalMenu)
+    public void LoadScene(string Scene)
     {
-        SceneManager.LoadScene("LocalMenu");
+        SceneManager.LoadScene(Scene);
     }
 }

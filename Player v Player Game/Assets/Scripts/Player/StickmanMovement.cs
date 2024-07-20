@@ -1,0 +1,72 @@
+using System.Collections;
+using Player_v_Player_Game.Data;
+using UnityEngine;
+
+namespace Player_v_Player_Game.Player
+{
+    public class StickmanMovement : MonoBehaviour
+    {
+        public float speed = 5f;
+        public float jumpForce = 60f;
+
+        private Rigidbody2D rb;
+        private int originalJumpCount = 0;
+        private bool paused;
+
+        void Start()
+        {
+            rb = GetComponent<Rigidbody2D>();
+            SaveSystem.RemoveData();
+            GameData.Load();
+            originalJumpCount = GameData.Instance.jumps;
+        }
+
+        void Update()
+        {
+                Move();
+                Jump();
+        }
+
+        void Move()
+        {
+            float moveInput = Input.GetAxis("Horizontal");
+            rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
+        }
+
+        void Jump()
+        {
+            if (Input.GetKeyDown("space") && GameData.Instance.jumps > 0)
+            {
+                rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+                GameData.Instance.jumps--;
+                GameData.Save();
+                Debug.Log("jumped");
+                StartCoroutine(PauseUpdate(0.1f));
+            }
+            if (!paused)
+            {
+                if (GameData.Instance.isTouchingGround)
+                {
+                    ResetJumps();
+                }
+            }
+        }
+
+        IEnumerator PauseUpdate(float pauseDuration)
+        {
+            paused = true;
+            yield return new WaitForSeconds(pauseDuration);
+            paused = false;
+        }
+
+        void ResetJumps()
+        {
+            if (GameData.Instance.jumps != originalJumpCount)
+            {
+                GameData.Instance.jumps = originalJumpCount;
+                GameData.Save();
+                Debug.Log("Jumps reset to original count: " + originalJumpCount);
+            }
+        }
+    }
+}

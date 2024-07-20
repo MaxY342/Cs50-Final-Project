@@ -25,5 +25,10 @@ namespace Player_v_Player_Game.Data
                 return new GameData();
             }
         }
+
+        public static void RemoveData()
+        {
+            PlayerPrefs.DeleteKey(dataKey);
+        }
     }
 }

@@ -9,10 +9,12 @@ namespace Player_v_Player_Game.Player
     public class HealthManager : MonoBehaviour
     {
         public Slider healthBar;
+        private int currentHealth;
         // Start is called before the first frame update
         void Start()
         {
             GameData.Load();
+            currentHealth = GameData.Instance.maxHealth;
             LoadHealthBar();
         }
 
@@ -24,21 +26,22 @@ namespace Player_v_Player_Game.Player
 
         public void RemoveHealth(int health)
         {
-            GameData.Instance.health -= health;
-            healthBar.value = GameData.Instance.health;
+            currentHealth -= health;
+            currentHealth = Mathf.Clamp(currentHealth, 0, GameData.Instance.maxHealth);
+            healthBar.value = currentHealth;
         }
 
         public void LoadHealthBar()
         {
-            healthBar.maxValue = GameData.health;
-            healthBar.value = GameData.health;
+            healthBar.maxValue = GameData.Instance.maxHealth;
+            healthBar.value = GameData.Instance.maxHealth;
         }
 
         public void IncreaseHealth(int health)
         {
-            GameData.Instance.health += health;
-            GameData.Instance.health = Mathf.Clamp(GameData.Instance.health, 0, GameData.health);
-            healthBar.value = GameData.Instance.health;
+            currentHealth += health;
+            currentHealth = Mathf.Clamp(currentHealth, 0, GameData.Instance.maxHealth);
+            healthBar.value = currentHealth;
         }
     }
 }

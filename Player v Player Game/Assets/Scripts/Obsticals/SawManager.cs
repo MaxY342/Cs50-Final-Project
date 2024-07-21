@@ -6,7 +6,7 @@ using UnityEngine;
 public class SawManager : MonoBehaviour
 {
     public GameObject sawManager;
-    public float rotationSpeed = 90f; // degrees per second
+    public float rotationSpeed = -180f; // degrees per second
     private List<Transform> saws = new List<Transform>();
     // Start is called before the first frame update
     void Start()

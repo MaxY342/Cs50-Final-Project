@@ -4804,7 +4804,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sawManager: {fileID: 1921422491}
-  rotationSpeed: 90
+  rotationSpeed: -180
 --- !u!1 &1822363949
 GameObject:
   m_ObjectHideFlags: 0

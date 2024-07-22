@@ -10,6 +10,7 @@ public class LobbyCode : MonoBehaviour
     void Start()
     {
         networkManager = FindObjectOfType<CustomNetworkManager>();
+        CreateGameRoom();
     }
 
     public void CreateGameRoom()
@@ -22,7 +23,7 @@ public class LobbyCode : MonoBehaviour
     private string GenerateRoomCode()
     {
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        char[] code = new char[4];
+        char[] code = new char[6];
         for (int i = 0; i < code.Length; i++)
         {
             code[i] = chars[Random.Range(0, chars.Length)];

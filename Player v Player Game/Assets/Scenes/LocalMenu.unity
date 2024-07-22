@@ -332,7 +332,7 @@ MonoBehaviour:
           m_StringArgument: Lobby
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 929376163}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: CustomNetworkManager, Assembly-CSharp
         m_MethodName: CreateGameRoom
         m_Mode: 1
@@ -824,7 +824,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 929376162}
-  - component: {fileID: 929376160}
   - component: {fileID: 929376163}
   m_Layer: 0
   m_Name: LobbyManager
@@ -833,30 +832,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &929376160
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 929376159}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7424c1070fad4ba2a7a96b02fbeb4bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  port: 7777
-  NoDelay: 1
-  SendTimeout: 5000
-  ReceiveTimeout: 30000
-  serverMaxMessageSize: 16384
-  serverMaxReceivesPerTick: 10000
-  serverSendQueueLimitPerConnection: 10000
-  serverReceiveQueueLimitPerConnection: 10000
-  clientMaxMessageSize: 16384
-  clientMaxReceivesPerTick: 1000
-  clientSendQueueLimit: 10000
-  clientReceiveQueueLimit: 10000
 --- !u!4 &929376162
 Transform:
   m_ObjectHideFlags: 0
@@ -881,44 +856,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 929376159}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32a4e35c4d135b946aef44ba8928b79a, type: 3}
+  m_Script: {fileID: 11500000, guid: 8d0dfbf7f5cc7ea4ba5bd0cb6758d6a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dontDestroyOnLoad: 1
-  runInBackground: 1
-  headlessStartMode: 1
-  editorAutoStart: 0
-  sendRate: 60
-  autoStartServerBuild: 0
-  autoConnectClientBuild: 0
-  offlineScene: 
-  onlineScene: 
-  transport: {fileID: 0}
-  networkAddress: localhost
-  maxConnections: 100
-  disconnectInactiveConnections: 0
-  disconnectInactiveTimeout: 60
-  authenticator: {fileID: 0}
-  playerPrefab: {fileID: 0}
-  autoCreatePlayer: 1
-  playerSpawnMethod: 0
-  spawnPrefabs: []
-  exceptionsDisconnect: 1
-  snapshotSettings:
-    bufferTimeMultiplier: 2
-    bufferLimit: 32
-    catchupNegativeThreshold: -1
-    catchupPositiveThreshold: 1
-    catchupSpeed: 0.019999999552965164
-    slowdownSpeed: 0.03999999910593033
-    driftEmaDuration: 1
-    dynamicAdjustment: 1
-    dynamicAdjustmentTolerance: 1
-    deliveryTimeEmaDuration: 2
-  evaluationMethod: 0
-  evaluationInterval: 3
-  timeInterpolationGui: 0
-  roomCodeText: {fileID: 0}
+  networkManagerPrefab: {fileID: 1929332964243748588, guid: 1e72e512884e63d4ca76f11028378fb1, type: 3}
 --- !u!1 &988433236
 GameObject:
   m_ObjectHideFlags: 0

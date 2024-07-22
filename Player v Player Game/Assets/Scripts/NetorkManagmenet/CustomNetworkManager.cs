@@ -6,9 +6,24 @@ using System.Collections.Generic;
 
 public class CustomNetworkManager : NetworkManager
 {
-    public Text roomCodeText;
+    public static CustomNetworkManager Instance { get; private set; }
 
+    public Text roomCodeText;
     private Dictionary<string, RoomData> roomCodes = new Dictionary<string, RoomData>();
+
+    public override void Awake()
+    {
+        base.Awake();
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     public void AddRoomCode(string roomCode, NetworkConnectionToClient hostConnection)
     {

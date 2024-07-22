@@ -1,19 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class JoinLobbyUI : MonoBehaviour
+public class JoinRoom : MonoBehaviour
 {
-    public InputField roomCodeInput;
-    private CustomNetworkManager networkManager;
+    public InputField roomCodeInputField;
 
-    void Start()
+    public void OnJoinRoomButtonClicked()
     {
-        networkManager = FindObjectOfType<CustomNetworkManager>();
-    }
-
-    public void JoinLobby()
-    {
-        string roomCode = roomCodeInput.text;
-        networkManager.JoinGameRoom(roomCode);
+        string roomCode = roomCodeInputField.text;
+        CustomNetworkManager.Instance.JoinGameRoom(roomCode);
     }
 }

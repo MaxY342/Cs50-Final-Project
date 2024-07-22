@@ -8,7 +8,6 @@ public class CustomNetworkManager : NetworkManager
 {
     public static CustomNetworkManager Instance { get; private set; }
 
-    public Text roomCodeText;
     private Dictionary<string, RoomData> roomCodes = new Dictionary<string, RoomData>();
 
     public override void Awake()

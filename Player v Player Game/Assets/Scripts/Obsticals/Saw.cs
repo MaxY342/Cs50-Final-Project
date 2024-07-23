@@ -26,7 +26,7 @@ namespace Player_v_Player_Game.Player
         {
             if (collision.gameObject.CompareTag("Player"))
             {
-                healthManager.RemoveHealth(20);
+                healthManager.RemoveHealth(10);
             }
         }
     }

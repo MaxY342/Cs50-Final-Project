@@ -59,6 +59,8 @@ namespace Player_v_Player_Game.Player
         {
             if (Input.GetKeyDown("space") && GameData.Instance.jumps > 0)
             {
+                anim.SetTrigger("takeoff");
+                anim.SetBool("isJumping", true);
                 rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
                 GameData.Instance.jumps--;
                 GameData.Save();
@@ -85,6 +87,7 @@ namespace Player_v_Player_Game.Player
         {
             if (GameData.Instance.jumps != originalJumpCount)
             {
+                anim.SetBool("isJumping", false);
                 GameData.Instance.jumps = originalJumpCount;
                 GameData.Save();
                 Debug.Log("Jumps reset to original count: " + originalJumpCount);

@@ -12,25 +12,47 @@ namespace Player_v_Player_Game.Player
         private Rigidbody2D rb;
         private int originalJumpCount = 0;
         private bool paused;
+        private Animator anim;
 
         void Start()
         {
+            anim = GetComponent<Animator>();
             rb = GetComponent<Rigidbody2D>();
             SaveSystem.RemoveData();
             GameData.Load();
             originalJumpCount = GameData.Instance.jumps;
+            rb.constraints = RigidbodyConstraints2D.None;
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
 
         void Update()
         {
-                Move();
-                Jump();
+            Move();
+            Jump();
         }
 
         void Move()
         {
             float moveInput = Input.GetAxis("Horizontal");
             rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
+            if (moveInput == 0)
+            {
+                anim.SetBool("isRunning", false);
+            }
+            else
+            {
+                anim.SetBool("isRunning", true);
+            }
+
+            if (moveInput < 0)
+            {
+                transform.eulerAngles = new Vector3(0, 180, 0);
+            }
+
+            else if (moveInput > 0)
+            {
+                transform.eulerAngles = new Vector3(0, 0, 0);
+            }
         }
 
         void Jump()

@@ -43,16 +43,6 @@ namespace Player_v_Player_Game.Player
             {
                 anim.SetBool("isRunning", true);
             }
-
-            if (moveInput < 0)
-            {
-                transform.eulerAngles = new Vector3(0, 180, 0);
-            }
-
-            else if (moveInput > 0)
-            {
-                transform.eulerAngles = new Vector3(0, 0, 0);
-            }
         }
 
         void Jump()

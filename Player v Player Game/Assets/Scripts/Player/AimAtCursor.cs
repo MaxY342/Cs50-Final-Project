@@ -2,32 +2,60 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AimAtCursor : MonoBehaviour
+namespace Player_v_Player_Game.Player
 {
-    public Transform arm;
-    // Start is called before the first frame update
-    void Start()
+    public class AimAtCursor : MonoBehaviour
     {
-        
-    }
+        public Transform arm;
+        private bool flipped = false;
 
-    // Update is called once per frame
-    void Update()
-    {
-        RotateArmTowardsCursor();
-    }
+        // Start is called before the first frame update
+        void Start()
+        {
 
-    void RotateArmTowardsCursor()
-    {
-        Vector3 mouseScreenPosition = Input.mousePosition;
+        }
 
-        Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(mouseScreenPosition);
-        mouseWorldPosition.z = 0;
+        // Update is called once per frame
+        void Update()
+        {
+            RotateArmTowardsCursor();
+        }
 
-        Vector3 directionToMouse = mouseWorldPosition - arm.position;
+        void RotateArmTowardsCursor()
+        {
+            Vector3 mouseScreenPosition = Input.mousePosition;
+            Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(mouseScreenPosition);
+            mouseWorldPosition.z = 0;
 
-        float angle = Mathf.Atan2(directionToMouse.y, directionToMouse.x) * Mathf.Rad2Deg;
+            Vector3 directionToMouse = mouseWorldPosition - arm.position;
 
-        arm.rotation = Quaternion.Euler(0, 0, angle);
+            float angle = Mathf.Atan2(directionToMouse.y, directionToMouse.x) * Mathf.Rad2Deg;
+
+            if (angle > 90 || angle < -90)
+            {
+                if (!flipped)
+                {
+                    Flip();
+                }
+                angle -= 180;
+            }
+            else
+            {
+                if (flipped)
+                {
+                    Flip();
+                }
+            }
+
+            arm.rotation = Quaternion.Euler(0, 0, angle);
+        }
+
+        void Flip()
+        {
+            flipped = !flipped;
+            Vector3 theScale = transform.localScale;
+            theScale.x *= -1;
+            transform.localScale = theScale;
+        }
     }
 }

@@ -1,7 +1,8 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-public class PanelHover : MonoBehaviour
+public class BackGroundHover : MonoBehaviour
 {
     private HoverManager HoverManager;
 
@@ -12,6 +13,6 @@ public class PanelHover : MonoBehaviour
 
     public void OnPointerEnter()
     {
-        HoverManager.ShowButtonsPanel();
+        HoverManager.HideButtons();
     }
 }

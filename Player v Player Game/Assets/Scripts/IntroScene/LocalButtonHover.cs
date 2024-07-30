@@ -1,22 +1,17 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class ButtonHoverHandler : MonoBehaviour
+public class ButtonHover : MonoBehaviour
 {
-    private HoverManager HoverManager;
+    private HoverManager hoverManager;
 
     void Start()
     {
-        HoverManager = FindObjectOfType<HoverManager>();
+        hoverManager = FindObjectOfType<HoverManager>();
     }
 
     public void OnPointerEnter()
     {
-        HoverManager.ShowButtons();
-    }
-
-    public void OnPointerExit()
-    {
-        HoverManager.HideButtons();
+        hoverManager.ShowButtonsHover();
     }
 }

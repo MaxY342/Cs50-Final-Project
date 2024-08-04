@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfec9112ee8aa6c4592289a3440bfc66, type: 3}
+  m_Name: SwordConfig
+  m_EditorClassIdentifier: 
+  weaponPreFab: {fileID: 3430206471074102542, guid: 17e2fe40f828f964f9dfc7560b9fb9f5, type: 3}
+  weaponPosition: {x: 0.391, y: 0.269, z: 0}
+  weaponRotation: {x: 0, y: 0, z: 12.323}
+  weaponIndex: 0

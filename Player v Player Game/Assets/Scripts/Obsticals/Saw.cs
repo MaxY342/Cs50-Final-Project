@@ -1,15 +1,17 @@
 using UnityEngine;
+using Player_v_Player_Game.Player;
+using Player_v_Player_Game.Interface;
 
-namespace Player_v_Player_Game.Player
+namespace Player_v_Player_Game.Obsticals
 {
     public class Saw : MonoBehaviour
     {
-        public float rotationSpeed = -180f; // degrees per second
-        private HealthManager healthManager;
+        [SerializeField] private float rotationSpeed = -180f; // degrees per second
+        [SerializeField] private int damageAmount = 20;
 
         void Start()
         {
-            healthManager = FindObjectOfType<HealthManager>();
+
         }
 
         void Update()
@@ -24,9 +26,10 @@ namespace Player_v_Player_Game.Player
 
         void OnCollisionEnter2D(Collision2D collision)
         {
-            if (collision.gameObject.CompareTag("Player"))
+            IDamageable iDamageable = collision.gameObject.GetComponent<IDamageable>();
+            if (iDamageable != null)
             {
-                healthManager.RemoveHealth(10);
+                iDamageable.Damage(damageAmount);
             }
         }
     }

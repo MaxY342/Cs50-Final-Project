@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Player_v_Player_Game.Data;
+using Player_v_Player_Game.Interface;
 
 namespace Player_v_Player_Game.Player
 {
-    public class HealthManager : MonoBehaviour
+    public class HealthManager : MonoBehaviour, IDamageable
     {
         public Slider healthBar;
         private int currentHealth;
@@ -29,6 +30,10 @@ namespace Player_v_Player_Game.Player
             currentHealth -= health;
             currentHealth = Mathf.Clamp(currentHealth, 0, GameData.Instance.maxHealth);
             healthBar.value = currentHealth;
+            if (currentHealth == 0)
+            {
+                Die();
+            }
         }
 
         public void LoadHealthBar()
@@ -42,6 +47,16 @@ namespace Player_v_Player_Game.Player
             currentHealth += health;
             currentHealth = Mathf.Clamp(currentHealth, 0, GameData.Instance.maxHealth);
             healthBar.value = currentHealth;
+        }
+
+        public void Damage(int damageAmount)
+        {
+            RemoveHealth(damageAmount);
+        }
+
+        private void Die()
+        {
+            Destroy(gameObject);
         }
     }
 }

@@ -67,6 +67,35 @@ namespace Lobby
             }
         }
 
+        public bool JoinGame(string matchId, NetworkIdentity player)
+        {
+            if (player == null)
+            {
+                Debug.LogError("Player NetworkIdentity is null.");
+                return false;
+            }
+
+            int playerId = (int)player.netId; // Convert NetworkIdentity's netId to int
+
+            if (MatchIds.Contains(matchId))
+            {
+                for (int i = 0; i < Matches.Count; i++)
+                {
+                    if (Matches[i].MatchId == matchId)
+                    {
+                        PlayerIds.Add(playerId);
+                    }
+                }
+                Debug.Log($"Match joined");
+                return true;
+            }
+            else
+            {
+                Debug.LogError("Match ID does not exist");
+                return false;
+            }
+        }
+
         public static string GetRandomMatchId()
         {
             string id = string.Empty;

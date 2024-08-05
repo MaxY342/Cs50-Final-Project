@@ -52,13 +52,14 @@ namespace Lobby
             joinmatchinput.interactable = false;
             joinbutton.interactable = false;
             hostbutton.interactable = false;
+            Player.localPlayer.JoinGame(joinmatchinput.text);
         }
 
         public void JoinSuccess(bool success)
         {
             if (success)
             {
-
+                lobbyCanvas.enabled = true;
             }
             else
             {

@@ -57,5 +57,41 @@ namespace Lobby
             Debug.Log($"MatchID: {_matchID} == {matchID}");
             UILobby.instance.HostSuccess(success);
         }
+
+        public void JoinGame(string inputID)
+        {
+            CmdJoinGame(inputID);
+        }
+
+        [Command]
+        void CmdJoinGame(string matchID)
+        {
+            NetworkIdentity networkIdentity = GetComponent<NetworkIdentity>();
+            if (networkIdentity == null)
+            {
+                Debug.LogError("NetworkIdentity component is missing.");
+                return;
+            }
+            _matchID = matchID;
+            if (MatchMaker.Instance.JoinGame(matchID, networkIdentity))
+            {
+                Debug.Log("Game Joined Successfully");
+                networkMatch.matchId = matchID.ToGuid();
+                TargetJoinGame(true, matchID);
+            }
+            else
+            {
+                Debug.LogError("Game Joining Failed");
+                TargetJoinGame(false, matchID);
+
+            }
+        }
+
+        [TargetRpc]
+        void TargetJoinGame(bool success, string matchID)
+        {
+            Debug.Log($"MatchID: {_matchID} == {matchID}");
+            UILobby.instance.JoinSuccess(success);
+        }
     }
 }

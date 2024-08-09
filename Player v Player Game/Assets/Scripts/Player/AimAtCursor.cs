@@ -8,11 +8,12 @@ namespace Player_v_Player_Game.Player
     {
         public Transform arm;
         private bool flipped = false;
+        private TrackCursor trackCursor;
 
         // Start is called before the first frame update
         void Start()
-        {
-
+        {  
+            trackCursor = GetComponent<TrackCursor>();
         }
 
         // Update is called once per frame
@@ -23,13 +24,7 @@ namespace Player_v_Player_Game.Player
 
         void RotateArmTowardsCursor()
         {
-            Vector3 mouseScreenPosition = Input.mousePosition;
-            Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(mouseScreenPosition);
-            mouseWorldPosition.z = 0;
-
-            Vector3 directionToMouse = mouseWorldPosition - arm.position;
-
-            float angle = Mathf.Atan2(directionToMouse.y, directionToMouse.x) * Mathf.Rad2Deg;
+            float angle = trackCursor.GetCursorAngleFromObj(arm);
 
             if (angle > 90 || angle < -90)
             {

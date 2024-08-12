@@ -8,9 +8,9 @@ using Player_v_Player_Game.Weapons;
 
 namespace Player_v_Player_Game.Weapons.Sword
 {
-    public class ChargeAttack : MonoBehaviour
+    public class ChargeSlash : MonoBehaviour
     {
-        [SerializeField] private GameObject chargeAttackPrefab;
+        [SerializeField] private GameObject chargeSlashPrefab;
         [SerializeField] private Image cooldownOverlay;
         [SerializeField] private TMP_Text cooldownText;
 
@@ -45,7 +45,7 @@ namespace Player_v_Player_Game.Weapons.Sword
             if (!isCooldown)
             {
                 float rotation = trackCursor.GetCursorAngleFromObj(firePoint);
-                Instantiate(chargeAttackPrefab, firePoint.position, Quaternion.Euler(0, 0, rotation));
+                Instantiate(chargeSlashPrefab, firePoint.position, Quaternion.Euler(0, 0, rotation));
                 StartCoroutine(HandleCooldown());
             }
         }

@@ -3,7 +3,7 @@ using Player_v_Player_Game.Interface;
 
 namespace Player_v_Player_Game.Weapons.Sword
 {
-    public class ChargeAttackProjectile : MonoBehaviour
+    public class ChargeSlashProjectile : MonoBehaviour
     {
         [SerializeField] private float speed = 20f;
         [SerializeField] private int damageAmount = 30;

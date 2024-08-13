@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Player_v_Player_Game.Player;
 using TMPro;
 using Player_v_Player_Game.Weapons;
+using UnityEditor;
 
 namespace Player_v_Player_Game.Weapons.Sword
 {
@@ -22,25 +23,21 @@ namespace Player_v_Player_Game.Weapons.Sword
 
         void Start()
         {
-            cooldownText.gameObject.SetActive(false);
-            cooldownOverlay.fillAmount = 0.0f;
             trackCursor = GetComponent<TrackCursor>();
             firePoint = transform.Find("CrescentSpawnPoint");
-            if (firePoint == null)
-            {
-                Debug.LogError("CrescentSpawnPoint not found on the sword prefab.");
-            }
+            cooldownText.gameObject.SetActive(false);
+            cooldownOverlay.fillAmount = 0.0f;
         }
 
         void Update()
         {
             if (Input.GetKeyDown("q"))
             {
-                ChargeSlash();
+                CastChargeSlash();
             }
         }
 
-        private void ChargeSlash()
+        public void CastChargeSlash()
         {
             if (!isCooldown)
             {
@@ -52,9 +49,9 @@ namespace Player_v_Player_Game.Weapons.Sword
 
         private IEnumerator HandleCooldown()
         {
-            isCooldown = false;
-            yield return StartCoroutine(cooldownManager.ApplyAbilityCooldown(cooldownTime, cooldownOverlay, cooldownText));
             isCooldown = true;
+            yield return StartCoroutine(cooldownManager.ApplyAbilityCooldown(cooldownTime, cooldownOverlay, cooldownText));
+            isCooldown = false;
         }
     }
 

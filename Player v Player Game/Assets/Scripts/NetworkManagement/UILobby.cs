@@ -9,14 +9,22 @@ namespace Lobby
     public class UILobby : MonoBehaviour
     {
 
-        public static UILobby instance; 
+        public static UILobby instance;
 
+        [Header ("Host Join")]
         [SerializeField] TMP_InputField joinmatchinput; 
         [SerializeField] Button joinbutton;
         [SerializeField] Button hostbutton;
 
         [SerializeField] Canvas lobbyCanvas;
 
+        [Header("Lobby")]
+        [SerializeField] Transform Players;
+
+        [SerializeField] GameObject UIPlayerPrefab;
+        [SerializeField] TMP_Text Code;
+        [SerializeField] TMP_Text text;
+        [SerializeField] TMP_Text matchIDText;
 
         void Start()
         {
@@ -37,6 +45,8 @@ namespace Lobby
             if (success)
             {
                 lobbyCanvas.enabled = true;
+                SpawnPlayerPrefab(Player.localPlayer);
+                matchIDText.text = Player.localPlayer._matchID;
             }
             else
             {
@@ -60,6 +70,8 @@ namespace Lobby
             if (success)
             {
                 lobbyCanvas.enabled = true;
+                SpawnPlayerPrefab(Player.localPlayer);
+                matchIDText.text = Player.localPlayer._matchID;
             }
             else
             {
@@ -67,6 +79,12 @@ namespace Lobby
                 joinbutton.interactable = true;
                 hostbutton.interactable = true;
             }
+        }
+
+        public void SpawnPlayerPrefab(Player player)
+        {
+            GameObject newUIPlayer = Instantiate(UIPlayerPrefab, Players);
+            newUIPlayer.GetComponent<UIPlayer>().SetPlayer(player);
         }
     }
 }

@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Player_v_Player_Game.Player;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Player_v_Player_Game.Weapons
@@ -8,8 +10,11 @@ namespace Player_v_Player_Game.Weapons
     {
         [SerializeField] private Transform weaponSocket;
         [SerializeField] private List<WeaponConfig> weaponConfigs;
+        [SerializeField] private Transform armSocket;
+        [SerializeField] private Transform arm;
 
         private GameObject currentWeapon;
+        private GameObject currentWeaponArm;
         private int currentWeaponIndex = 0;
         private Animator anim;
 
@@ -27,6 +32,17 @@ namespace Player_v_Player_Game.Weapons
             {
                 Attack();
             }
+            if (Input.GetKeyDown("e"))
+            {
+                if (currentWeaponIndex >= weaponConfigs.Count - 1)
+                {
+                    EquipWeapon(0);
+                }
+                else
+                {
+                    EquipWeapon(currentWeaponIndex + 1);
+                }
+            }
         }
 
         private void EquipWeapon(int index)
@@ -39,10 +55,16 @@ namespace Player_v_Player_Game.Weapons
             if (currentWeapon != null)
             {
                 Destroy(currentWeapon);
+                Destroy(currentWeaponArm);
             }
 
             WeaponConfig config = weaponConfigs[index];
-            currentWeapon = Instantiate(config.weaponPreFab, weaponSocket.position + config.weaponPosition, weaponSocket.rotation * Quaternion.Euler(config.weaponRotation), weaponSocket);
+            currentWeaponArm = Instantiate(config.armPreFab, armSocket);
+            currentWeaponArm.transform.localPosition = config.armPosition;
+            currentWeaponArm.transform.localRotation = Quaternion.Euler(config.armRotation);
+            currentWeapon = Instantiate(config.weaponPreFab, weaponSocket);
+            currentWeapon.transform.localPosition = config.weaponPosition;
+            currentWeapon.transform.localRotation = Quaternion.Euler(config.weaponRotation);
 
             currentWeaponIndex = index;
 

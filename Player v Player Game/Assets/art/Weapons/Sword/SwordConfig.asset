@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfec9112ee8aa6c4592289a3440bfc66, type: 3}
   m_Name: SwordConfig
   m_EditorClassIdentifier: 
+  armPreFab: {fileID: 3686936895692477708, guid: 338364ffbe0b7a84f8efb57cca76b032, type: 3}
+  armPosition: {x: 0.83, y: -0.85, z: 0}
+  armRotation: {x: 0, y: 0, z: 0}
   weaponPreFab: {fileID: 3430206471074102542, guid: 17e2fe40f828f964f9dfc7560b9fb9f5, type: 3}
-  weaponPosition: {x: 0.391, y: 0.269, z: 0}
-  weaponRotation: {x: 0, y: 0, z: 12.323}
+  weaponPosition: {x: 3.9, y: 2.25, z: 0}
+  weaponRotation: {x: 0, y: 0, z: 13}
   weaponIndex: 0

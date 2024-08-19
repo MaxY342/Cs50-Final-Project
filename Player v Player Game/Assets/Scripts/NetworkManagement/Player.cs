@@ -9,8 +9,9 @@ namespace Lobby
     {
         public static Player localPlayer;
         [SyncVar] public string _matchID;
+        [SyncVar] public int playerIndex;
 
-        NetworkMatch networkMatch; 
+        NetworkMatch networkMatch;
 
         void Start()
         {
@@ -37,23 +38,26 @@ namespace Lobby
                 return;
             }
             _matchID = matchID;
-            if (MatchMaker.Instance.HostGame(matchID, networkIdentity))
+            if (MatchMaker.Instance.HostGame(matchID, networkIdentity, out int assignedIndex))
             {
                 Debug.Log("Game Hosted Successfully");
                 networkMatch.matchId = matchID.ToGuid();
-                TargetHostGame(true, matchID);
+                playerIndex = assignedIndex;
+                RpcSetMatchID(_matchID);
+                RpcSpawnPlayerPrefab(playerIndex);
+                TargetHostGame(true, matchID, playerIndex);
             }
             else
             {
                 Debug.LogError("Game Hosting Failed");
-                TargetHostGame(false, matchID);
-
+                TargetHostGame(false, matchID, playerIndex);
             }
         }
 
         [TargetRpc]
-        void TargetHostGame(bool success, string matchID)
+        void TargetHostGame(bool success, string matchID, int _playerIndex)
         {
+            playerIndex = _playerIndex;
             Debug.Log($"MatchID: {_matchID} == {matchID}");
             UILobby.instance.HostSuccess(success);
         }
@@ -73,25 +77,46 @@ namespace Lobby
                 return;
             }
             _matchID = matchID;
-            if (MatchMaker.Instance.JoinGame(matchID, networkIdentity))
+            if (MatchMaker.Instance.JoinGame(matchID, networkIdentity, out int assignedIndex))
             {
                 Debug.Log("Game Joined Successfully");
                 networkMatch.matchId = matchID.ToGuid();
-                TargetJoinGame(true, matchID);
+                playerIndex = assignedIndex;
+                RpcSetMatchID(_matchID);
+                RpcSpawnPlayerPrefab(playerIndex);
+                TargetJoinGame(true, matchID, playerIndex);
             }
             else
             {
                 Debug.LogError("Game Joining Failed");
-                TargetJoinGame(false, matchID);
-
+                TargetJoinGame(false, matchID, playerIndex);
             }
         }
 
         [TargetRpc]
-        void TargetJoinGame(bool success, string matchID)
+        void TargetJoinGame(bool success, string matchID, int _playerIndex)
         {
+            playerIndex = _playerIndex;
             Debug.Log($"MatchID: {_matchID} == {matchID}");
             UILobby.instance.JoinSuccess(success);
+        }
+
+        [ClientRpc]
+        void RpcSpawnPlayerPrefab(int assignedIndex)
+        {
+            playerIndex = assignedIndex;
+            UILobby.instance.SpawnPlayerPrefab(this);
+        }
+
+        [ClientRpc]
+        void RpcSetMatchID(string matchID)
+        {
+            _matchID = matchID;
+        }
+
+        public string GetCode()
+        {
+            return _matchID;
         }
     }
 }

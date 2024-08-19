@@ -11,53 +11,47 @@ namespace Lobby
     public class Match
     {
         public string MatchId;
+        public List<NetworkIdentity> players = new List<NetworkIdentity>(); // Using NetworkIdentity instead of GameObject
 
-        public Match(string matchId)
+        public Match(string matchId, NetworkIdentity player)
         {
             MatchId = matchId;
+            players.Add(player);
         }
 
         public Match() { }
-    }
-
-    [Serializable]
-    public class SyncListMatch : SyncList<Match>
-    {
-        // Custom serialization logic can be added here if needed.
     }
 
     public class MatchMaker : NetworkBehaviour
     {
         public static MatchMaker Instance;
 
-        public readonly SyncListMatch Matches = new SyncListMatch();
-        public readonly SyncList<string> MatchIds = new SyncList<string>();
-        public readonly SyncList<int> PlayerIds = new SyncList<int>();
-
+        public List<Match> Matches = new List<Match>(); // Simplified to List
+        public List<string> MatchIds = new List<string>();
 
         private static readonly string Characters = "abcdefghijklmnopqrstuvwxyz0123456789";
 
-        private void Start()
+        private void Awake()
         {
             Instance = this;
         }
 
-        public bool HostGame(string matchId, NetworkIdentity player)
+        public bool HostGame(string matchId, NetworkIdentity player, out int playerIndex)
         {
+            playerIndex = -1;
             if (player == null)
             {
                 Debug.LogError("Player NetworkIdentity is null.");
                 return false;
             }
 
-            int playerId = (int)player.netId; // Convert NetworkIdentity's netId to int
-
             if (!MatchIds.Contains(matchId))
             {
                 MatchIds.Add(matchId);
-                Matches.Add(new Match(matchId)); // Store player ID as int
-                PlayerIds.Add(playerId); // Store player ID separately
-                Debug.Log($"Match generated: ID = {matchId}, Player ID = {playerId}");
+                Match newMatch = new Match(matchId, player);
+                Matches.Add(newMatch);
+                playerIndex = newMatch.players.Count; // Should be 1 since this is the first player
+                Debug.Log($"Match generated: ID = {matchId}, Player Index = {playerIndex}");
                 return true;
             }
             else
@@ -67,33 +61,28 @@ namespace Lobby
             }
         }
 
-        public bool JoinGame(string matchId, NetworkIdentity player)
+        public bool JoinGame(string matchId, NetworkIdentity player, out int playerIndex)
         {
+            playerIndex = -1;
             if (player == null)
             {
                 Debug.LogError("Player NetworkIdentity is null.");
                 return false;
             }
 
-            int playerId = (int)player.netId; // Convert NetworkIdentity's netId to int
-
-            if (MatchIds.Contains(matchId))
+            foreach (var match in Matches)
             {
-                for (int i = 0; i < Matches.Count; i++)
+                if (match.MatchId == matchId)
                 {
-                    if (Matches[i].MatchId == matchId)
-                    {
-                        PlayerIds.Add(playerId);
-                    }
+                    match.players.Add(player);
+                    playerIndex = match.players.Count;
+                    Debug.Log($"Player joined match ID = {matchId}, Player Index = {playerIndex}");
+                    return true;
                 }
-                Debug.Log($"Match joined");
-                return true;
             }
-            else
-            {
-                Debug.LogError("Match ID does not exist");
-                return false;
-            }
+
+            Debug.LogError("Match ID does not exist");
+            return false;
         }
 
         public static string GetRandomMatchId()
@@ -119,7 +108,7 @@ namespace Lobby
             byte[] inputBytes = Encoding.Default.GetBytes(id);
             byte[] hashBytes = provider.ComputeHash(inputBytes);
 
-            return new Guid (hashBytes);
+            return new Guid(hashBytes);
         }
     }
 }

@@ -19,3 +19,4 @@ MonoBehaviour:
   weaponPosition: {x: 3.72, y: 0.22, z: 0}
   weaponRotation: {x: 0, y: 0, z: 0}
   weaponIndex: 1
+  weaponName: Revolver

@@ -60,14 +60,17 @@ namespace Player_v_Player_Game.Weapons
 
             WeaponConfig config = weaponConfigs[index];
             currentWeaponArm = Instantiate(config.armPreFab, armSocket);
+            currentWeaponArm.name = config.weaponName + "Arm";
             currentWeaponArm.transform.localPosition = config.armPosition;
             currentWeaponArm.transform.localRotation = Quaternion.Euler(config.armRotation);
             currentWeapon = Instantiate(config.weaponPreFab, weaponSocket);
+            currentWeapon.name = config.weaponName;
             currentWeapon.transform.localPosition = config.weaponPosition;
             currentWeapon.transform.localRotation = Quaternion.Euler(config.weaponRotation);
 
             currentWeaponIndex = index;
 
+            anim.Rebind();
             anim.SetInteger("weaponIndex", config.weaponIndex);
         }
 

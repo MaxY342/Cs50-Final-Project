@@ -19,3 +19,4 @@ MonoBehaviour:
   weaponPosition: {x: 3.15, y: 0.35, z: 0}
   weaponRotation: {x: 0, y: 0, z: 0}
   weaponIndex: 2
+  weaponName: Sniper

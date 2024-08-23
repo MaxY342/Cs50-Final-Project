@@ -12,4 +12,5 @@ public class WeaponConfig : ScriptableObject
     public Vector3 weaponPosition;
     public Vector3 weaponRotation;
     public int weaponIndex;
+    public string weaponName;
 }

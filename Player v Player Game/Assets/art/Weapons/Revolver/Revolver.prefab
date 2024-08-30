@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1897330421437437615}
   - component: {fileID: 4280608700891079491}
   - component: {fileID: -4935982847036737144}
+  - component: {fileID: -3709469218243535378}
   m_Layer: 0
   m_Name: Revolver
   m_TagString: Untagged
@@ -33,6 +34,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8648195107760060833}
+  - {fileID: 4416288123733346655}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1897330421437437615
@@ -113,6 +115,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed15da474010e554ba126112806e4c7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-3709469218243535378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 91655088938935695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63451f7219a7706419c4a604d062bd27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ammoPrefab: {fileID: 7299711758520463266, guid: 5c43216c0d013c947a1180c2fce93ffb, type: 3}
+  position: {fileID: 4416288123733346655}
+  numOfAmmo: 6
+  ammoVerticalOffset: {x: 0, y: 0.65, z: 0}
+  ammoHorizontalOffset: {x: 0.65, y: 0, z: 0}
+  reloadSpeed: 3
+  reloading: 0
 --- !u!1 &2374369885713509426
 GameObject:
   m_ObjectHideFlags: 0
@@ -139,6 +160,37 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 1.68, y: 0.6, z: 0}
+  m_LocalScale: {x: 1.1111112, y: 1.1111112, z: 0}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 694317582852952537}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8028323449912380798
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4416288123733346655}
+  m_Layer: 0
+  m_Name: AmmoLocation
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4416288123733346655
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8028323449912380798}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.65, y: 1.1, z: 0}
   m_LocalScale: {x: 1.1111112, y: 1.1111112, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -31,6 +31,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 9150986271305363867}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7672527322540443331
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4127882158195879596}
+  m_Layer: 0
+  m_Name: AmmoLocation
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4127882158195879596
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7672527322540443331}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.091, y: 0.66, z: -0.015375495}
+  m_LocalScale: {x: 0.8333333, y: 0.8333333, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9150986271305363867}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8600825221674646559
 GameObject:
   m_ObjectHideFlags: 0
@@ -43,6 +74,7 @@ GameObject:
   - component: {fileID: 634758318027705233}
   - component: {fileID: 5103966629013009443}
   - component: {fileID: 3299090728116388079}
+  - component: {fileID: 130232451969189090}
   m_Layer: 0
   m_Name: Sniper
   m_TagString: Untagged
@@ -64,6 +96,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7678536909365007213}
+  - {fileID: 4127882158195879596}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &634758318027705233
@@ -144,3 +177,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed15da474010e554ba126112806e4c7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &130232451969189090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8600825221674646559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63451f7219a7706419c4a604d062bd27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ammoPrefab: {fileID: 7299711758520463266, guid: 5c43216c0d013c947a1180c2fce93ffb, type: 3}
+  position: {fileID: 4127882158195879596}
+  numOfAmmo: 5
+  ammoVerticalOffset: {x: 0, y: 0.65, z: 0}
+  ammoHorizontalOffset: {x: 0.65, y: 0, z: 0}
+  reloadSpeed: 4
+  reloading: 0

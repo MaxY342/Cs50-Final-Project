@@ -14,9 +14,9 @@ namespace Player_v_Player_Game.Weapons.Sword
             rb.velocity = transform.right * speed;
         }
 
-        void OnTriggerEnter2D(Collider2D col)
+        void OnCollisionEnter2D(Collision2D collision)
         {
-            IDamageable iDamageable = col.gameObject.GetComponent<IDamageable>();
+            IDamageable iDamageable = collision.gameObject.GetComponent<IDamageable>();
             if (iDamageable != null)
             {
                 iDamageable.Damage(damageAmount);

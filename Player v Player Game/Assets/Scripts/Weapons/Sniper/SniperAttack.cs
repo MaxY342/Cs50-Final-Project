@@ -12,10 +12,12 @@ namespace Player_v_Player_Game.Weapons.Revolver
         [SerializeField] private Transform firePoint;
 
         private TrackCursor trackCursor;
+        private AmmoManager ammoManager;
         // Start is called before the first frame update
         void Start()
         {
             trackCursor = GetComponent<TrackCursor>();
+            ammoManager = GetComponent<AmmoManager>();
         }
 
         // Update is called once per frame
@@ -23,7 +25,10 @@ namespace Player_v_Player_Game.Weapons.Revolver
         {
             if (Input.GetMouseButtonDown(0))
             {
-                Shoot();
+                if (!ammoManager.OutOfAmmo() && !ammoManager.reloading)
+                {
+                    Shoot();
+                }
             }
         }
 
@@ -31,6 +36,7 @@ namespace Player_v_Player_Game.Weapons.Revolver
         {
             float rotation = trackCursor.GetCursorAngleFromObj(firePoint) - 90;
             Instantiate(bulletPreFab, firePoint.position, Quaternion.Euler(0, 0, rotation));
+            ammoManager.UseAmmo(1);
         }
     }
 }

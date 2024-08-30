@@ -8,16 +8,18 @@ namespace Player_v_Player_Game.Weapons.Revolver
         [SerializeField] private float speed = 20f;
         [SerializeField] private int damageAmount = 20;
         [SerializeField] private Rigidbody2D rb;
+        [SerializeField] private GameObject bulletImpactPrefab;
 
         void Start()
         {
             rb.velocity = transform.up * speed;
         }
 
-        void OnTriggerEnter2D(Collider2D col)
+        void OnCollisionEnter2D(Collision2D collision)
         {
+            Instantiate(bulletImpactPrefab, transform.position, transform.rotation);
             Destroy(gameObject);
-            IDamageable iDamageable = col.gameObject.GetComponent<IDamageable>();
+            IDamageable iDamageable = collision.gameObject.GetComponent<IDamageable>();
             if (iDamageable != null)
             {
                 iDamageable.Damage(damageAmount);

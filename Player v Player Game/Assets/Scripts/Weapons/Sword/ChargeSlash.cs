@@ -50,7 +50,7 @@ namespace Player_v_Player_Game.Weapons.Sword
         private IEnumerator HandleCooldown()
         {
             isCooldown = true;
-            yield return StartCoroutine(cooldownManager.ApplyAbilityCooldown(cooldownTime, cooldownOverlay, cooldownText));
+            yield return StartCoroutine(cooldownManager.ApplyCooldown(cooldownTime, cooldownOverlay, cooldownText));
             isCooldown = false;
         }
     }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Player_v_Player_Game.Weapons
 {
@@ -12,13 +13,16 @@ namespace Player_v_Player_Game.Weapons
         [SerializeField] private Vector3 ammoVerticalOffset;
         [SerializeField] private Vector3 ammoHorizontalOffset;
         [SerializeField] private float reloadSpeed;
+        [SerializeField] private Image cooldownOverlay;
+        public bool reloading = false;
 
         private List<GameObject> totalAmmo;
         private GameObject currentAmmo;
-        public bool reloading = false;
+        private CooldownManager cooldownManager = new CooldownManager();
 
         void Start()
         {
+            cooldownOverlay.fillAmount = 0.0f;
             totalAmmo = new List<GameObject>();
             LoadAmmo(numOfAmmo, position);
         }
@@ -27,7 +31,7 @@ namespace Player_v_Player_Game.Weapons
         {
             if (OutOfAmmo() || Input.GetKeyDown("r"))
             {
-                if (!reloading)
+                if (!reloading && !FullAmmo())
                 {
                     StartCoroutine(Reload(reloadSpeed));
                 }
@@ -111,10 +115,22 @@ namespace Player_v_Player_Game.Weapons
             return true;
         }
 
+        public bool FullAmmo()
+        {
+            foreach(GameObject ammo in totalAmmo)
+            {
+                if (!ammo.activeSelf)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public IEnumerator Reload(float time)
         {
             reloading = true;
-            yield return new WaitForSeconds(time);
+            yield return StartCoroutine(cooldownManager.ApplyCooldown(time, cooldownOverlay));
             ReloadAmmo(numOfAmmo);
             reloading = false;
         }

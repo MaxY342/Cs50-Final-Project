@@ -37,63 +37,68 @@ namespace Player_v_Player_Game.Weapons.Sword
             Vector3[] vertices = mesh.vertices;
             int[] triangles = mesh.triangles;
 
+            List<Vector3> newVertices = new List<Vector3>();
+            List<int> newTriangles = new List<int>();
+
+            // Convert slice points to local space
+            Vector2 localSliceStart = target.transform.InverseTransformPoint(sliceStart);
+            Vector2 localSliceEnd = target.transform.InverseTransformPoint(sliceEnd);
+
             for (int i = 0; i < triangles.Length; i += 3)
             {
                 Vector3 v0 = vertices[triangles[i]];
                 Vector3 v1 = vertices[triangles[i + 1]];
                 Vector3 v2 = vertices[triangles[i + 2]];
 
+                // Convert vertices to world space if needed
+                Vector3 worldV0 = target.transform.TransformPoint(v0);
+                Vector3 worldV1 = target.transform.TransformPoint(v1);
+                Vector3 worldV2 = target.transform.TransformPoint(v2);
+
                 // Check if the slice line intersects this triangle
-                // (v0, v1, v2 represent the three vertices of the triangle)
-                if (IsLineIntersectingTriangle(sliceStart, sliceEnd, v0, v1, v2))
+                if (IsLineIntersectingTriangle(localSliceStart, localSliceEnd, v0, v1, v2))
                 {
-                    
+                    // Add logic here to calculate the intersection points, create new triangles
+                    // Add the new vertices and triangles to the lists
+                }
+                else
+                {
+                    // If no intersection, just add the triangle to the new mesh data
+                    newVertices.Add(v0);
+                    newVertices.Add(v1);
+                    newVertices.Add(v2);
+
+                    newTriangles.Add(newVertices.Count - 3);
+                    newTriangles.Add(newVertices.Count - 2);
+                    newTriangles.Add(newVertices.Count - 1);
                 }
             }
 
-            if (originalCollider == null)
-            {
-                Debug.LogWarning("Object cannot be sliced as it doesn't have a PolygonCollider2D");
-                return;
-            }
+            // After processing all triangles, apply the new mesh data
+            Mesh newMesh = new Mesh();
+            newMesh.vertices = newVertices.ToArray();
+            newMesh.triangles = newTriangles.ToArray();
+            newMesh.RecalculateNormals();
 
-            // Calculate the new vertices for the slice
-            Vector2[] vertices1, vertices2;
-            CalculateSlicedVertices(originalCollider, sliceStart, sliceEnd, out vertices1, out vertices2);
-
-            // Create the first sliced part
-            GameObject slice1 = Instantiate(target, target.transform.position, target.transform.rotation);
-            slice1.GetComponent<PolygonCollider2D>().SetPath(0, vertices1);
-            ApplyPhysics(slice1);
-
-            // Create the second sliced part
-            GameObject slice2 = Instantiate(target, target.transform.position, target.transform.rotation);
-            slice2.GetComponent<PolygonCollider2D>().SetPath(0, vertices2);
-            ApplyPhysics(slice2);
-
-            // Destroy the original object
-            Destroy(target);
+            // Create new GameObject for sliced part (or replace the original mesh)
+            GameObject slicedObject = new GameObject("SlicedObject", typeof(MeshFilter), typeof(MeshRenderer));
+            slicedObject.GetComponent<MeshFilter>().mesh = newMesh;
+            slicedObject.transform.position = target.transform.position;
+            slicedObject.transform.rotation = target.transform.rotation;
         }
 
         bool IsLineIntersectingTriangle(Vector2 p0, Vector2 p1, Vector3 v0, Vector3 v1, Vector3 v2)
         {
-            // Calculate the line equation coefficients
-            float A = p1.y - p0.y;
-            float B = p0.x - p1.x;
-            float C = p1.x * p0.y - p0.x * p1.y;
+            float v0side = (p1.x - p0.x) * (v0.y - p0.y) - (p1.y - p0.y) * (v0.x - p0.x);
+            float v1side = (p1.x - p0.x) * (v1.y - p0.y) - (p1.y - p0.y) * (v1.x - p0.x);
+            float v2side = (p1.x - p0.x) * (v2.y - p0.y) - (p1.y - p0.y) * (v2.x - p0.x);
 
-            // Calculate the signed distances for the vertices
-            float d0 = A * v0.x + B * v0.y + C;
-            float d1 = A * v1.x + B * v1.y + C;
-            float d2 = A * v2.x + B * v2.y + C;
-
-            // Check if all vertices are on the same side of the line
-            if ((d0 > 0 && d1 > 0 && d2 > 0) || (d0 < 0 && d1 < 0 && d2 < 0))
+            if ((v0side >= 0 && v1side >= 0 && v2side >= 0) || (v0side <= 0 && v1side <= 0 && v2side <= 0))
             {
-                return false; // No intersection
+                return false;
             }
 
-            return true; // Intersection occurs
+            return true;
         }
 
         void CalculateSlicedVertices(PolygonCollider2D originalCollider, Vector2 sliceStart, Vector2 sliceEnd, out Vector2[] vertices1, out Vector2[] vertices2)

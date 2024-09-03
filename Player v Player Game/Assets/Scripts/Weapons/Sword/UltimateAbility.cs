@@ -32,99 +32,203 @@ namespace Player_v_Player_Game.Weapons.Sword
 
         public void SliceObject(GameObject target, Vector2 sliceStart, Vector2 sliceEnd)
         {
-            PolygonCollider2D originalCollider = target.GetComponent<PolygonCollider2D>();
-            Mesh mesh = target.GetComponent<MeshFilter>().mesh;
+            MeshFilter meshFilter = target.GetComponent<MeshFilter>();
+            if (meshFilter == null)
+            {
+                Debug.LogError("MeshFilter component not found on target GameObject.");
+                return;
+            }
+
+            Mesh mesh = meshFilter.mesh;
             Vector3[] vertices = mesh.vertices;
             int[] triangles = mesh.triangles;
 
-            List<Vector3> newVertices = new List<Vector3>();
-            List<int> newTriangles = new List<int>();
+            List<Vector3> leftVertices = new List<Vector3>();
+            List<int> leftTriangles = new List<int>();
+
+            List<Vector3> rightVertices = new List<Vector3>();
+            List<int> rightTriangles = new List<int>();
 
             // Convert slice points to local space
             Vector2 localSliceStart = target.transform.InverseTransformPoint(sliceStart);
             Vector2 localSliceEnd = target.transform.InverseTransformPoint(sliceEnd);
 
+            // Iterate through each triangle
             for (int i = 0; i < triangles.Length; i += 3)
             {
                 Vector3 v0 = vertices[triangles[i]];
                 Vector3 v1 = vertices[triangles[i + 1]];
                 Vector3 v2 = vertices[triangles[i + 2]];
 
-                // Convert vertices to world space if needed
-                Vector3 worldV0 = target.transform.TransformPoint(v0);
-                Vector3 worldV1 = target.transform.TransformPoint(v1);
-                Vector3 worldV2 = target.transform.TransformPoint(v2);
+                // Determine on which side each vertex lies
+                int v0Side = SideOfPointFromSlice(sliceStart, sliceEnd, v0);
+                int v1Side = SideOfPointFromSlice(sliceStart, sliceEnd, v1);
+                int v2Side = SideOfPointFromSlice(sliceStart, sliceEnd, v2);
 
-                // Check if the slice line intersects this triangle
-                if (IsLineIntersectingTriangle(localSliceStart, localSliceEnd, v0, v1, v2))
+                // Classify the triangle based on vertex positions
+                if (v0Side >= 0 && v1Side >= 0 && v2Side >= 0)
                 {
-                    // Add logic here to calculate the intersection points, create new triangles
-                    // Add the new vertices and triangles to the lists
+                    // Entire triangle is on the left side
+                    AddTriangleToMesh(v0, v1, v2, leftVertices, leftTriangles);
+                }
+                else if (v0Side <= 0 && v1Side <= 0 && v2Side <= 0)
+                {
+                    // Entire triangle is on the right side
+                    AddTriangleToMesh(v0, v1, v2, rightVertices, rightTriangles);
                 }
                 else
                 {
-                    // If no intersection, just add the triangle to the new mesh data
-                    newVertices.Add(v0);
-                    newVertices.Add(v1);
-                    newVertices.Add(v2);
-
-                    newTriangles.Add(newVertices.Count - 3);
-                    newTriangles.Add(newVertices.Count - 2);
-                    newTriangles.Add(newVertices.Count - 1);
+                    // Triangle is intersected by the slice
+                    HandleIntersection(v0, v1, v2, v0Side, v1Side, v2Side, sliceStart, sliceEnd, leftVertices, leftTriangles, rightVertices, rightTriangles);
                 }
             }
 
-            // After processing all triangles, apply the new mesh data
-            Mesh newMesh = new Mesh();
-            newMesh.vertices = newVertices.ToArray();
-            newMesh.triangles = newTriangles.ToArray();
-            newMesh.RecalculateNormals();
+            // Create and apply new meshes to GameObjects
+            Mesh leftMesh = CreateMesh(leftVertices, leftTriangles);
+            Mesh rightMesh = CreateMesh(rightVertices, rightTriangles);
 
-            // Create new GameObject for sliced part (or replace the original mesh)
-            GameObject slicedObject = new GameObject("SlicedObject", typeof(MeshFilter), typeof(MeshRenderer));
-            slicedObject.GetComponent<MeshFilter>().mesh = newMesh;
-            slicedObject.transform.position = target.transform.position;
-            slicedObject.transform.rotation = target.transform.rotation;
+            // Assuming leftObject and rightObject are predefined GameObjects to hold the sliced parts
+            ApplyMeshToObject(leftMesh, leftObject);
+            ApplyMeshToObject(rightMesh, rightObject);
         }
 
-        bool IsLineIntersectingTriangle(Vector2 p0, Vector2 p1, Vector3 v0, Vector3 v1, Vector3 v2)
-        {
-            float v0side = (p1.x - p0.x) * (v0.y - p0.y) - (p1.y - p0.y) * (v0.x - p0.x);
-            float v1side = (p1.x - p0.x) * (v1.y - p0.y) - (p1.y - p0.y) * (v1.x - p0.x);
-            float v2side = (p1.x - p0.x) * (v2.y - p0.y) - (p1.y - p0.y) * (v2.x - p0.x);
+            // Create and apply new meshes to GameObjects
+            Mesh leftMesh = CreateMesh(leftVertices, leftTriangles);
+            Mesh rightMesh = CreateMesh(rightVertices, rightTriangles);
 
-            if ((v0side >= 0 && v1side >= 0 && v2side >= 0) || (v0side <= 0 && v1side <= 0 && v2side <= 0))
+            ApplyMeshToObject(leftMesh, leftObject);
+            ApplyMeshToObject(rightMesh, rightObject);
+        }
+
+        // checks if point c is left of line a-b
+        int SideOfPointFromSlice(Vector2 a, Vector2 b, Vector3 c)
+        {
+            // Convert Vector3 to Vector2 by ignoring the z-axis
+            Vector2 c2D = new Vector2(c.x, c.y);
+
+            // Calculate the cross product
+            float cross = (b.x - a.x) * (c2D.y - a.y) - (b.y - a.y) * (c2D.x - a.x);
+
+            if (cross > 0)
             {
-                return false;
+                return 1;
             }
 
-            return true;
+            else if (cross < 0)
+            {
+                return -1;
+            }
+
+            else
+            {
+                return 0;
+            }
+        }
+        void HandleIntersection(
+            Vector3 v0, Vector3 v1, Vector3 v2,
+            int v0Side, int v1Side, int v2Side,
+            Vector2 sliceStart, Vector2 sliceEnd,
+            List<Vector3> leftVertices, List<int> leftTriangles,
+            List<Vector3> rightVertices, List<int> rightTriangles)
+        {
+            // Collect vertices and their sides
+            List<(Vector3 vertex, int side)> verts = new List<(Vector3, int)>
+            {
+                (v0, v0Side),
+                (v1, v1Side),
+                (v2, v2Side)
+            };
+
+            // Separate vertices into positive and negative sides
+            List<(Vector3 vertex, int side)> positive = verts.FindAll(v => v.side > 0);
+            List<(Vector3 vertex, int side)> negative = verts.FindAll(v => v.side < 0);
+            List<(Vector3 vertex, int side)> onLine = verts.FindAll(v => v.side == 0);
+
+            // Depending on the number of vertices on each side, handle accordingly
+            if (positive.Count == 2 && negative.Count == 1)
+            {
+                // Two vertices on positive side, one on negative
+                SplitTriangle(positive, negative[0], sliceStart, sliceEnd, leftVertices, leftTriangles, rightVertices, rightTriangles);
+            }
+            else if (negative.Count == 2 && positive.Count == 1)
+            {
+                // Two vertices on negative side, one on positive
+                SplitTriangle(negative, positive[0], sliceStart, sliceEnd, rightVertices, rightTriangles, leftVertices, leftTriangles);
+            }
+            else if (onLine.Count > 0)
+            {
+                // Handle cases where one or more vertices lie exactly on the slice line
+                // This requires careful handling to avoid duplicating vertices
+                // Implementation depends on specific requirements
+            }
+            // Additional cases can be handled as needed
         }
 
-        void CalculateSlicedVertices(PolygonCollider2D originalCollider, Vector2 sliceStart, Vector2 sliceEnd, out Vector2[] vertices1, out Vector2[] vertices2)
+        void SplitTriangle(
+            List<(Vector3 vertex, int side)> positive,
+            (Vector3 vertex, int side) negative,
+            Vector2 sliceStart, Vector2 sliceEnd,
+            List<Vector3> targetMeshVertices, List<int> targetMeshTriangles,
+            List<Vector3> oppositeMeshVertices, List<int> oppositeMeshTriangles)
         {
-            // Calculate new vertices based on the slice line
-            // This is complex and requires calculating where the slice line intersects with the polygon's edges
-            vertices1 = new Vector2[0]; // Placeholder for actual slicing logic
-            vertices2 = new Vector2[0]; // Placeholder for actual slicing logic
+            // Find intersection points between the slice line and the triangle edges
+            Vector3 intersection1 = GetIntersection(positive[0].vertex, negative.vertex, sliceStart, sliceEnd);
+            Vector3 intersection2 = GetIntersection(positive[1].vertex, negative.vertex, sliceStart, sliceEnd);
+
+            // Add the original positive vertices and the intersection points to the target mesh
+            targetMeshVertices.Add(positive[0].vertex);
+            targetMeshVertices.Add(positive[1].vertex);
+            targetMeshVertices.Add(intersection1);
+            targetMeshVertices.Add(intersection2);
+
+            int baseIndex = targetMeshVertices.Count - 4;
+
+            // Create two new triangles for the target mesh
+            targetMeshTriangles.Add(baseIndex);
+            targetMeshTriangles.Add(baseIndex + 2);
+            targetMeshTriangles.Add(baseIndex + 3);
+
+            targetMeshTriangles.Add(baseIndex);
+            targetMeshTriangles.Add(baseIndex + 3);
+            targetMeshTriangles.Add(baseIndex + 1);
+
+            // Add the negative vertex and intersection points to the opposite mesh
+            oppositeMeshVertices.Add(negative.vertex);
+            oppositeMeshVertices.Add(intersection1);
+            oppositeMeshVertices.Add(intersection2);
+
+            int oppBaseIndex = oppositeMeshVertices.Count - 3;
+
+            // Create one new triangle for the opposite mesh
+            oppositeMeshTriangles.Add(oppBaseIndex);
+            oppositeMeshTriangles.Add(oppBaseIndex + 1);
+            oppositeMeshTriangles.Add(oppBaseIndex + 2);
         }
 
-        void ApplyPhysics(GameObject slicedPart)
+        Vector3 GetIntersection(Vector3 vertexA, Vector3 vertexB, Vector2 sliceStart, Vector2 sliceEnd)
         {
-            Rigidbody2D rb = slicedPart.AddComponent<Rigidbody2D>();
-            rb.gravityScale = 1.0f;
-            rb.mass = 1.0f;
+            Vector2 a = new Vector2(vertexA.x, vertexA.y);
+            Vector2 b = new Vector2(vertexB.x, vertexB.y);
+            Vector2 c = sliceStart;
+            Vector2 d = sliceEnd;
 
-            // Apply force or torque to simulate the slicing impact
-            rb.AddForce(Random.insideUnitCircle * 2.0f, ForceMode2D.Impulse);
-            rb.AddTorque(Random.Range(-100.0f, 100.0f), ForceMode2D.Impulse);
-        }
+            float t1 = (d.x - c.x);
+            float t2 = (d.y - c.y);
+            float t3 = (b.x - a.x);
+            float t4 = (b.y - a.y);
+            float denominator = t1 * t4 - t2 * t3;
 
-        void AddSliceVisualEffect(Vector2 position)
-        {
-            // Instantiate a particle effect at the position
-            GameObject particleEffect = Instantiate(slicingParticleEffectPrefab, position, Quaternion.identity);
-            Destroy(particleEffect, 2.0f); // Destroy the effect after 2 seconds
+            if (denominator == 0)
+            {
+                // Lines are parallel; handle accordingly
+                return Vector3.zero;
+            }
+
+            float t = ((a.x - c.x) * t4 - (a.y - c.y) * t3) / denominator;
+            // float u = ((a.x - c.x) * t2 - (a.y - c.y) * t1) / denominator; // Not used here
+
+            Vector2 intersection = c + t * new Vector2(t1, t2);
+            return new Vector3(intersection.x, intersection.y, vertexA.z); // Assuming z remains the same
         }
     }
 }

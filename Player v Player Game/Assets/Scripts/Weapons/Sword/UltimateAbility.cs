@@ -230,5 +230,51 @@ namespace Player_v_Player_Game.Weapons.Sword
             Vector2 intersection = c + t * new Vector2(t1, t2);
             return new Vector3(intersection.x, intersection.y, vertexA.z); // Assuming z remains the same
         }
+        void AddTriangleToMesh(Vector3 v0, Vector3 v1, Vector3 v2, List<Vector3> meshVertices, List<int> meshTriangles)
+        {
+            int index = meshVertices.Count;
+            meshVertices.Add(v0);
+            meshVertices.Add(v1);
+            meshVertices.Add(v2);
+            meshTriangles.Add(index);
+            meshTriangles.Add(index + 1);
+            meshTriangles.Add(index + 2);
+        }
+
+        Mesh CreateMesh(List<Vector3> vertices, List<int> triangles)
+        {
+            Mesh newMesh = new Mesh();
+            newMesh.vertices = vertices.ToArray();
+            newMesh.triangles = triangles.ToArray();
+            newMesh.RecalculateNormals();
+            newMesh.RecalculateBounds();
+            return newMesh;
+        }
+
+        void ApplyMeshToObject(Mesh mesh, GameObject obj)
+        {
+            if (obj == null)
+            {
+                Debug.LogError("Target GameObject is null.");
+                return;
+            }
+
+            MeshFilter meshFilter = obj.GetComponent<MeshFilter>();
+            if (meshFilter == null)
+            {
+                meshFilter = obj.AddComponent<MeshFilter>();
+            }
+
+            MeshRenderer meshRenderer = obj.GetComponent<MeshRenderer>();
+            if (meshRenderer == null)
+            {
+                meshRenderer = obj.AddComponent<MeshRenderer>();
+            }
+
+            meshFilter.mesh = mesh;
+
+            // Optionally, assign a material if needed
+            // meshRenderer.material = someMaterial;
+        }
     }
 }

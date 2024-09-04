@@ -124,157 +124,70 @@ namespace Player_v_Player_Game.Weapons.Sword
                 return 0;
             }
         }
-        void HandleIntersection(
-            Vector3 v0, Vector3 v1, Vector3 v2,
-            int v0Side, int v1Side, int v2Side,
-            Vector2 sliceStart, Vector2 sliceEnd,
+        void HandleIntersection(Vector3 v0, Vector3 v1, Vector3 v2, int v0Side, int v1Side, int v2Side,
             List<Vector3> leftVertices, List<int> leftTriangles,
             List<Vector3> rightVertices, List<int> rightTriangles)
         {
-            // Collect vertices and their sides
-            List<(Vector3 vertex, int side)> verts = new List<(Vector3, int)>
+            // Store vertices on either side
+            List<Vector3> leftSideVertices = new List<Vector3>();
+            List<Vector3> rightSideVertices = new List<Vector3>();
+        
+            // Determine which vertices are on which side
+            if (v0Side > 0) leftSideVertices.Add(v0); else rightSideVertices.Add(v0);
+            if (v1Side > 0) leftSideVertices.Add(v1); else rightSideVertices.Add(v1);
+            if (v2Side > 0) leftSideVertices.Add(v2); else rightSideVertices.Add(v2);
+        
+            // We should have two vertices on one side and one on the other.
+            if (leftSideVertices.Count == 2 && rightSideVertices.Count == 1)
             {
-                (v0, v0Side),
-                (v1, v1Side),
-                (v2, v2Side)
-            };
-
-            // Separate vertices into positive and negative sides
-            List<(Vector3 vertex, int side)> positive = verts.FindAll(v => v.side > 0);
-            List<(Vector3 vertex, int side)> negative = verts.FindAll(v => v.side < 0);
-            List<(Vector3 vertex, int side)> onLine = verts.FindAll(v => v.side == 0);
-
-            // Depending on the number of vertices on each side, handle accordingly
-            if (positive.Count == 2 && negative.Count == 1)
-            {
-                // Two vertices on positive side, one on negative
-                SplitTriangle(positive, negative[0], sliceStart, sliceEnd, leftVertices, leftTriangles, rightVertices, rightTriangles);
+                // Slice the triangle
+                Vector3 intersection1 = GetIntersectionPoint(leftSideVertices[0], rightSideVertices[0]);
+                Vector3 intersection2 = GetIntersectionPoint(leftSideVertices[1], rightSideVertices[0]);
+        
+                // Add two triangles to the left side
+                AddTriangleToMesh(leftSideVertices[0], intersection1, intersection2, leftVertices, leftTriangles);
+                AddTriangleToMesh(leftSideVertices[0], leftSideVertices[1], intersection2, leftVertices, leftTriangles);
+        
+                // Add one triangle to the right side
+                AddTriangleToMesh(rightSideVertices[0], intersection1, intersection2, rightVertices, rightTriangles);
             }
-            else if (negative.Count == 2 && positive.Count == 1)
+            else if (rightSideVertices.Count == 2 && leftSideVertices.Count == 1)
             {
-                // Two vertices on negative side, one on positive
-                SplitTriangle(negative, positive[0], sliceStart, sliceEnd, rightVertices, rightTriangles, leftVertices, leftTriangles);
+                // Slice the triangle
+                Vector3 intersection1 = GetIntersectionPoint(rightSideVertices[0], leftSideVertices[0]);
+                Vector3 intersection2 = GetIntersectionPoint(rightSideVertices[1], leftSideVertices[0]);
+        
+                // Add two triangles to the right side
+                AddTriangleToMesh(rightSideVertices[0], intersection1, intersection2, rightVertices, rightTriangles);
+                AddTriangleToMesh(rightSideVertices[0], rightSideVertices[1], intersection2, rightVertices, rightTriangles);
+        
+                // Add one triangle to the left side
+                AddTriangleToMesh(leftSideVertices[0], intersection1, intersection2, leftVertices, leftTriangles);
             }
-            else if (onLine.Count > 0)
-            {
-                // Handle cases where one or more vertices lie exactly on the slice line
-                // This requires careful handling to avoid duplicating vertices
-                // Implementation depends on specific requirements
-            }
-            // Additional cases can be handled as needed
         }
-
-        void SplitTriangle(
-            List<(Vector3 vertex, int side)> positive,
-            (Vector3 vertex, int side) negative,
-            Vector2 sliceStart, Vector2 sliceEnd,
-            List<Vector3> targetMeshVertices, List<int> targetMeshTriangles,
-            List<Vector3> oppositeMeshVertices, List<int> oppositeMeshTriangles)
+        
+        Vector3 GetIntersectionPoint(Vector3 start, Vector3 end)
         {
-            // Find intersection points between the slice line and the triangle edges
-            Vector3 intersection1 = GetIntersection(positive[0].vertex, negative.vertex, sliceStart, sliceEnd);
-            Vector3 intersection2 = GetIntersection(positive[1].vertex, negative.vertex, sliceStart, sliceEnd);
-
-            // Add the original positive vertices and the intersection points to the target mesh
-            targetMeshVertices.Add(positive[0].vertex);
-            targetMeshVertices.Add(positive[1].vertex);
-            targetMeshVertices.Add(intersection1);
-            targetMeshVertices.Add(intersection2);
-
-            int baseIndex = targetMeshVertices.Count - 4;
-
-            // Create two new triangles for the target mesh
-            targetMeshTriangles.Add(baseIndex);
-            targetMeshTriangles.Add(baseIndex + 2);
-            targetMeshTriangles.Add(baseIndex + 3);
-
-            targetMeshTriangles.Add(baseIndex);
-            targetMeshTriangles.Add(baseIndex + 3);
-            targetMeshTriangles.Add(baseIndex + 1);
-
-            // Add the negative vertex and intersection points to the opposite mesh
-            oppositeMeshVertices.Add(negative.vertex);
-            oppositeMeshVertices.Add(intersection1);
-            oppositeMeshVertices.Add(intersection2);
-
-            int oppBaseIndex = oppositeMeshVertices.Count - 3;
-
-            // Create one new triangle for the opposite mesh
-            oppositeMeshTriangles.Add(oppBaseIndex);
-            oppositeMeshTriangles.Add(oppBaseIndex + 1);
-            oppositeMeshTriangles.Add(oppBaseIndex + 2);
+            // The equation of the line (ray) is known from the sliceStart and sliceEnd.
+            // We want to find where this line intersects the edge from start to end.
+            Vector2 sliceDir = sliceEnd - sliceStart;
+            Vector2 edgeDir = end - start;
+        
+            float t = Vector3.Cross(sliceStart - start, edgeDir).z / Vector3.Cross(sliceDir, edgeDir).z;
+        
+            return start + t * (end - start);
         }
-
-        Vector3 GetIntersection(Vector3 vertexA, Vector3 vertexB, Vector2 sliceStart, Vector2 sliceEnd)
+        
+        void AddTriangleToMesh(Vector3 v0, Vector3 v1, Vector3 v2, List<Vector3> vertices, List<int> triangles)
         {
-            Vector2 a = new Vector2(vertexA.x, vertexA.y);
-            Vector2 b = new Vector2(vertexB.x, vertexB.y);
-            Vector2 c = sliceStart;
-            Vector2 d = sliceEnd;
-
-            float t1 = (d.x - c.x);
-            float t2 = (d.y - c.y);
-            float t3 = (b.x - a.x);
-            float t4 = (b.y - a.y);
-            float denominator = t1 * t4 - t2 * t3;
-
-            if (denominator == 0)
-            {
-                // Lines are parallel; handle accordingly
-                return Vector3.zero;
-            }
-
-            float t = ((a.x - c.x) * t4 - (a.y - c.y) * t3) / denominator;
-            // float u = ((a.x - c.x) * t2 - (a.y - c.y) * t1) / denominator; // Not used here
-
-            Vector2 intersection = c + t * new Vector2(t1, t2);
-            return new Vector3(intersection.x, intersection.y, vertexA.z); // Assuming z remains the same
-        }
-        void AddTriangleToMesh(Vector3 v0, Vector3 v1, Vector3 v2, List<Vector3> meshVertices, List<int> meshTriangles)
-        {
-            int index = meshVertices.Count;
-            meshVertices.Add(v0);
-            meshVertices.Add(v1);
-            meshVertices.Add(v2);
-            meshTriangles.Add(index);
-            meshTriangles.Add(index + 1);
-            meshTriangles.Add(index + 2);
-        }
-
-        Mesh CreateMesh(List<Vector3> vertices, List<int> triangles)
-        {
-            Mesh newMesh = new Mesh();
-            newMesh.vertices = vertices.ToArray();
-            newMesh.triangles = triangles.ToArray();
-            newMesh.RecalculateNormals();
-            newMesh.RecalculateBounds();
-            return newMesh;
-        }
-
-        void ApplyMeshToObject(Mesh mesh, GameObject obj)
-        {
-            if (obj == null)
-            {
-                Debug.LogError("Target GameObject is null.");
-                return;
-            }
-
-            MeshFilter meshFilter = obj.GetComponent<MeshFilter>();
-            if (meshFilter == null)
-            {
-                meshFilter = obj.AddComponent<MeshFilter>();
-            }
-
-            MeshRenderer meshRenderer = obj.GetComponent<MeshRenderer>();
-            if (meshRenderer == null)
-            {
-                meshRenderer = obj.AddComponent<MeshRenderer>();
-            }
-
-            meshFilter.mesh = mesh;
-
-            // Optionally, assign a material if needed
-            // meshRenderer.material = someMaterial;
+            int index = vertices.Count;
+            vertices.Add(v0);
+            vertices.Add(v1);
+            vertices.Add(v2);
+        
+            triangles.Add(index);
+            triangles.Add(index + 1);
+            triangles.Add(index + 2);
         }
     }
 }

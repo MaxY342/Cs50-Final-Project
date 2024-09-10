@@ -17,7 +17,7 @@ namespace Player_v_Player_Game.Weapons.Sword
 
         void Update()
         {
-            if (Input.GetKeyDown("e"))
+            if (Input.GetKeyDown("r"))
             {
                 Vector2 playerPosition = transform.position;
                 Vector2 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);

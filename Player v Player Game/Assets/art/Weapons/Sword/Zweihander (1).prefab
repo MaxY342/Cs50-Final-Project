@@ -116,6 +116,7 @@ GameObject:
   - component: {fileID: 2230305488348056154}
   - component: {fileID: 6482552557789285063}
   - component: {fileID: 2157294481688397177}
+  - component: {fileID: 1344615208318567667}
   m_Layer: 0
   m_Name: Zweihander (1)
   m_TagString: Untagged
@@ -278,6 +279,19 @@ MonoBehaviour:
   chargeSlashPrefab: {fileID: 8672518023046307494, guid: ae73935d845ee5b449f72fd8254292cd, type: 3}
   cooldownOverlay: {fileID: 6534256305190226811}
   cooldownText: {fileID: 2721469048945023349}
+--- !u!114 &1344615208318567667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3430206471074102542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aec65a39e2860b42a74983c8ef94696, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slicingParticleEffectPrefab: {fileID: 0}
 --- !u!1 &5649322492003884182
 GameObject:
   m_ObjectHideFlags: 0

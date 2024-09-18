@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 7364521276970065497}
   - component: {fileID: 7064996894629242687}
   m_Layer: 5
-  m_Name: UIPlayerPrefab
-  m_TagString: Untagged
+  m_Name: UIPlayer1Prefab
+  m_TagString: UIPlayer1
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

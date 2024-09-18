@@ -1,4 +1,8 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Player_v_Player_Game.Weapons.Sword
 {
@@ -24,6 +28,7 @@ namespace Player_v_Player_Game.Weapons.Sword
                 {
                     if (hit.collider != null)
                     {
+                        ConvertSpriteToMesh(hit.collider.gameObject);
                         SliceObject(hit.collider.gameObject, playerPosition, mouseWorldPosition);
                     }
                 }
@@ -61,9 +66,9 @@ namespace Player_v_Player_Game.Weapons.Sword
                 Vector3 v2 = vertices[triangles[i + 2]];
 
                 // Determine on which side each vertex lies
-                int v0Side = SideOfPointFromSlice(sliceStart, sliceEnd, v0);
-                int v1Side = SideOfPointFromSlice(sliceStart, sliceEnd, v1);
-                int v2Side = SideOfPointFromSlice(sliceStart, sliceEnd, v2);
+                int v0Side = SideOfPointFromSlice(localSliceStart, localSliceEnd, v0);
+                int v1Side = SideOfPointFromSlice(localSliceStart, localSliceEnd, v1);
+                int v2Side = SideOfPointFromSlice(localSliceStart, localSliceEnd, v2);
 
                 // Classify the triangle based on vertex positions
                 if (v0Side >= 0 && v1Side >= 0 && v2Side >= 0)
@@ -79,7 +84,7 @@ namespace Player_v_Player_Game.Weapons.Sword
                 else
                 {
                     // Triangle is intersected by the slice
-                    HandleIntersection(v0, v1, v2, v0Side, v1Side, v2Side, sliceStart, sliceEnd, leftVertices, leftTriangles, rightVertices, rightTriangles);
+                    HandleIntersection(v0, v1, v2, v0Side, v1Side, v2Side, localSliceStart, localSliceEnd, leftVertices, leftTriangles, rightVertices, rightTriangles);
                 }
             }
 
@@ -87,17 +92,17 @@ namespace Player_v_Player_Game.Weapons.Sword
             Mesh leftMesh = CreateMesh(leftVertices, leftTriangles);
             Mesh rightMesh = CreateMesh(rightVertices, rightTriangles);
 
-            // Assuming leftObject and rightObject are predefined GameObjects to hold the sliced parts
-            ApplyMeshToObject(leftMesh, leftObject);
-            ApplyMeshToObject(rightMesh, rightObject);
-        }
+            // create left and right slice gameobjects
+            GameObject leftObject = new GameObject("LeftSlice");
+            leftObject.AddComponent<MeshFilter>().mesh = leftMesh;
+            leftObject.AddComponent<MeshRenderer>().material = target.GetComponent<MeshRenderer>().material;
 
-            // Create and apply new meshes to GameObjects
-            Mesh leftMesh = CreateMesh(leftVertices, leftTriangles);
-            Mesh rightMesh = CreateMesh(rightVertices, rightTriangles);
+            GameObject rightObject = new GameObject("RightSlice");
+            rightObject.AddComponent<MeshFilter>().mesh = rightMesh;
+            rightObject.AddComponent<MeshRenderer>().material = target.GetComponent<MeshRenderer>().material;
 
-            ApplyMeshToObject(leftMesh, leftObject);
-            ApplyMeshToObject(rightMesh, rightObject);
+            leftObject.transform.position = target.transform.position;
+            rightObject.transform.position = target.transform.position;
         }
 
         // checks if point c is left of line a-b
@@ -124,7 +129,8 @@ namespace Player_v_Player_Game.Weapons.Sword
                 return 0;
             }
         }
-        void HandleIntersection(Vector3 v0, Vector3 v1, Vector3 v2, int v0Side, int v1Side, int v2Side,
+
+        void HandleIntersection(Vector3 v0, Vector3 v1, Vector3 v2, int v0Side, int v1Side, int v2Side, Vector2 sliceStart, Vector2 sliceEnd,
             List<Vector3> leftVertices, List<int> leftTriangles,
             List<Vector3> rightVertices, List<int> rightTriangles)
         {
@@ -141,8 +147,8 @@ namespace Player_v_Player_Game.Weapons.Sword
             if (leftSideVertices.Count == 2 && rightSideVertices.Count == 1)
             {
                 // Slice the triangle
-                Vector3 intersection1 = GetIntersectionPoint(leftSideVertices[0], rightSideVertices[0]);
-                Vector3 intersection2 = GetIntersectionPoint(leftSideVertices[1], rightSideVertices[0]);
+                Vector3 intersection1 = GetIntersectionPoint(leftSideVertices[0], rightSideVertices[0], sliceStart, sliceEnd);
+                Vector3 intersection2 = GetIntersectionPoint(leftSideVertices[1], rightSideVertices[0], sliceStart, sliceEnd);
         
                 // Add two triangles to the left side
                 AddTriangleToMesh(leftSideVertices[0], intersection1, intersection2, leftVertices, leftTriangles);
@@ -154,8 +160,8 @@ namespace Player_v_Player_Game.Weapons.Sword
             else if (rightSideVertices.Count == 2 && leftSideVertices.Count == 1)
             {
                 // Slice the triangle
-                Vector3 intersection1 = GetIntersectionPoint(rightSideVertices[0], leftSideVertices[0]);
-                Vector3 intersection2 = GetIntersectionPoint(rightSideVertices[1], leftSideVertices[0]);
+                Vector3 intersection1 = GetIntersectionPoint(rightSideVertices[0], leftSideVertices[0], sliceStart, sliceEnd);
+                Vector3 intersection2 = GetIntersectionPoint(rightSideVertices[1], leftSideVertices[0], sliceStart, sliceEnd);
         
                 // Add two triangles to the right side
                 AddTriangleToMesh(rightSideVertices[0], intersection1, intersection2, rightVertices, rightTriangles);
@@ -166,15 +172,16 @@ namespace Player_v_Player_Game.Weapons.Sword
             }
         }
         
-        Vector3 GetIntersectionPoint(Vector3 start, Vector3 end)
+        Vector3 GetIntersectionPoint(Vector3 start, Vector3 end, Vector2 sliceStart, Vector2 sliceEnd)
         {
-            // The equation of the line (ray) is known from the sliceStart and sliceEnd.
-            // We want to find where this line intersects the edge from start to end.
+            // Convert slice direction to local space if necessary
             Vector2 sliceDir = sliceEnd - sliceStart;
             Vector2 edgeDir = end - start;
-        
-            float t = Vector3.Cross(sliceStart - start, edgeDir).z / Vector3.Cross(sliceDir, edgeDir).z;
-        
+
+            // Calculate the intersection point using parametric equation of the line
+            float t = ((sliceStart.x - start.x) * (sliceStart.y - sliceEnd.y) - (sliceStart.y - start.y) * (sliceStart.x - sliceEnd.x)) / ((start.x - end.x) * (sliceStart.y - sliceEnd.y) - (start.y - end.y) * (sliceStart.x - sliceEnd.x));
+
+            // Calculate intersection point along the edge
             return start + t * (end - start);
         }
         
@@ -188,6 +195,68 @@ namespace Player_v_Player_Game.Weapons.Sword
             triangles.Add(index);
             triangles.Add(index + 1);
             triangles.Add(index + 2);
+        }
+
+        Mesh CreateMesh(List<Vector3> vertices, List<int> triangles)
+        {
+            Mesh mesh = new Mesh();
+            
+            // Assign vertices and triangles to the mesh
+            mesh.SetVertices(vertices);
+            mesh.SetTriangles(triangles, 0);
+            
+            // Recalculate normals and bounds for proper rendering and physics interactions
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            
+            return mesh;
+        }
+
+        void ConvertSpriteToMesh(GameObject target)
+        {
+            SpriteRenderer spriteRenderer = target.GetComponent<SpriteRenderer>();
+            if (spriteRenderer == null) return;
+
+            // Add or get existing MeshFilter and MeshRenderer
+            MeshFilter meshFilter = target.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer = target.AddComponent<MeshRenderer>();
+
+            Mesh mesh = new Mesh();
+
+            // Convert sprite data to mesh (using sprite vertices)
+            Vector2[] spriteVertices = spriteRenderer.sprite.vertices;
+            ushort[] spriteTriangles = spriteRenderer.sprite.triangles;
+
+            // Convert 2D vertices to 3D by adding a z value of 0
+            Vector3[] vertices = new Vector3[spriteVertices.Length];
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                vertices[i] = new Vector3(spriteVertices[i].x, spriteVertices[i].y, 0f);
+            }
+
+            // Assign vertices and triangles to mesh
+            mesh.vertices = vertices;
+            mesh.triangles = Array.ConvertAll(spriteTriangles, i => (int)i);
+
+            // Assign UVs for texturing
+            mesh.uv = spriteRenderer.sprite.uv;
+
+            // Optionally assign normals (for lighting, 2D games often don't need this)
+            Vector3[] normals = new Vector3[vertices.Length];
+            for (int i = 0; i < normals.Length; i++)
+            {
+                normals[i] = Vector3.back; // Normals point to -Z for 2D sprites
+            }
+            mesh.normals = normals;
+
+            // Assign the generated mesh to the MeshFilter
+            meshFilter.mesh = mesh;
+
+            // Set the same material as the SpriteRenderer
+            meshRenderer.material = spriteRenderer.material;
+
+            // Remove the SpriteRenderer after conversion (optional, if you don't need it anymore)
+            Destroy(spriteRenderer);
         }
     }
 }

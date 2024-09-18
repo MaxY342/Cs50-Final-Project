@@ -11,8 +11,8 @@ namespace Lobby
 
         public static UILobby instance;
 
-        [Header ("Host Join")]
-        [SerializeField] TMP_InputField joinmatchinput; 
+        [Header("Host Join")]
+        [SerializeField] TMP_InputField joinmatchinput;
         [SerializeField] Button joinbutton;
         [SerializeField] Button hostbutton;
 
@@ -21,7 +21,8 @@ namespace Lobby
         [Header("Lobby")]
         [SerializeField] Transform Players;
 
-        [SerializeField] GameObject UIPlayerPrefab;
+        [SerializeField] GameObject UIPlayer1Prefab;
+        [SerializeField] GameObject UIPlayer2Prefab;
         [SerializeField] TMP_Text Code;
         [SerializeField] TMP_Text text;
         [SerializeField] TMP_Text matchIDText;
@@ -45,7 +46,6 @@ namespace Lobby
             if (success)
             {
                 lobbyCanvas.enabled = true;
-                SpawnPlayerPrefab(Player.localPlayer);
                 matchIDText.text = Player.localPlayer._matchID;
             }
             else
@@ -70,7 +70,6 @@ namespace Lobby
             if (success)
             {
                 lobbyCanvas.enabled = true;
-                SpawnPlayerPrefab(Player.localPlayer);
                 matchIDText.text = Player.localPlayer._matchID;
             }
             else
@@ -83,8 +82,21 @@ namespace Lobby
 
         public void SpawnPlayerPrefab(Player player)
         {
-            GameObject newUIPlayer = Instantiate(UIPlayerPrefab, Players);
+            GameObject existingUIPlayer1 = GameObject.FindWithTag("UIPlayer1"); 
+
+            GameObject newUIPlayer;
+
+            if (existingUIPlayer1 != null) // Check if a clone of UIPlayer1Prefab is already in the scene
+            {
+                newUIPlayer = Instantiate(UIPlayer2Prefab, Players);
+            }
+            else
+            {
+                newUIPlayer = Instantiate(UIPlayer1Prefab, Players);
+            }
+
             newUIPlayer.GetComponent<UIPlayer>().SetPlayer(player);
         }
+
     }
 }

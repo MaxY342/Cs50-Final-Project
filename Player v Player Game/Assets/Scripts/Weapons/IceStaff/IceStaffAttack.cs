@@ -10,7 +10,6 @@ namespace Player_v_Player_Game.Weapons.IceStaff
     {
         [SerializeField] private GameObject attackPrefab;
         [SerializeField] private Transform firePoint;
-        [SerializeField] private int damageAmount = 15;
 
         private TrackCursor trackCursor;
         private AmmoManager ammoManager;

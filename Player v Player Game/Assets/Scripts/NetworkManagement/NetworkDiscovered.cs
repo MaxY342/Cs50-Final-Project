@@ -12,7 +12,7 @@ namespace Lobby
         public NetworkDiscovery networkDiscovery;
         public NetworkManager networkManager;
 
-        void Start()
+        public void StarttheDiscovery()
         {
             if (networkDiscovery != null)
             {

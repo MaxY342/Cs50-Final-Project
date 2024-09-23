@@ -83,5 +83,13 @@ namespace Player_v_Player_Game.Player
                 Debug.Log("Jumps reset to original count: " + originalJumpCount);
             }
         }
+
+        public IEnumerator ApplySlow(float amount, float duration)
+        {
+            float originalSpeed = speed;
+            speed = amount;
+            yeild return new WaitForSeconds(duration);
+            speed = originalSpeed;
+        }
     }
 }

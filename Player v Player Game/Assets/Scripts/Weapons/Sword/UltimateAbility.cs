@@ -28,7 +28,6 @@ namespace Player_v_Player_Game.Weapons.Sword
                 {
                     if (hit.collider != null)
                     {
-                        ConvertSpriteToMesh(hit.collider.gameObject);
                         SliceObject(hit.collider.gameObject, playerPosition, mouseWorldPosition);
                     }
                 }
@@ -65,10 +64,15 @@ namespace Player_v_Player_Game.Weapons.Sword
                 Vector3 v1 = vertices[triangles[i + 1]];
                 Vector3 v2 = vertices[triangles[i + 2]];
 
+                // Convert vertices to 2D (ignore z)
+                Vector2 v0_2D = new Vector2(v0.x, v0.y);
+                Vector2 v1_2D = new Vector2(v1.x, v1.y);
+                Vector2 v2_2D = new Vector2(v2.x, v2.y);
+
                 // Determine on which side each vertex lies
-                int v0Side = SideOfPointFromSlice(localSliceStart, localSliceEnd, v0);
-                int v1Side = SideOfPointFromSlice(localSliceStart, localSliceEnd, v1);
-                int v2Side = SideOfPointFromSlice(localSliceStart, localSliceEnd, v2);
+                int v0Side = SideOfPointFromSlice(localSliceStart, localSliceEnd, v0_2D);
+                int v1Side = SideOfPointFromSlice(localSliceStart, localSliceEnd, v1_2D);
+                int v2Side = SideOfPointFromSlice(localSliceStart, localSliceEnd, v2_2D);
 
                 // Classify the triangle based on vertex positions
                 if (v0Side >= 0 && v1Side >= 0 && v2Side >= 0)
@@ -103,31 +107,18 @@ namespace Player_v_Player_Game.Weapons.Sword
 
             leftObject.transform.position = target.transform.position;
             rightObject.transform.position = target.transform.position;
+            Destroy(target);
         }
 
         // checks if point c is left of line a-b
-        int SideOfPointFromSlice(Vector2 a, Vector2 b, Vector3 c)
+        int SideOfPointFromSlice(Vector2 a, Vector2 b, Vector2 c)
         {
-            // Convert Vector3 to Vector2 by ignoring the z-axis
-            Vector2 c2D = new Vector2(c.x, c.y);
-
             // Calculate the cross product
-            float cross = (b.x - a.x) * (c2D.y - a.y) - (b.y - a.y) * (c2D.x - a.x);
+            float cross = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 
-            if (cross > 0)
-            {
-                return 1;
-            }
-
-            else if (cross < 0)
-            {
-                return -1;
-            }
-
-            else
-            {
-                return 0;
-            }
+            if (cross > 0) return 1;
+            else if (cross < 0) return -1;
+            else return 0;
         }
 
         void HandleIntersection(Vector3 v0, Vector3 v1, Vector3 v2, int v0Side, int v1Side, int v2Side, Vector2 sliceStart, Vector2 sliceEnd,
@@ -174,15 +165,19 @@ namespace Player_v_Player_Game.Weapons.Sword
         
         Vector3 GetIntersectionPoint(Vector3 start, Vector3 end, Vector2 sliceStart, Vector2 sliceEnd)
         {
-            // Convert slice direction to local space if necessary
-            Vector2 sliceDir = sliceEnd - sliceStart;
-            Vector2 edgeDir = end - start;
+            // Convert start and end to 2D
+            Vector2 start2D = new Vector2(start.x, start.y);
+            Vector2 end2D = new Vector2(end.x, end.y);
 
-            // Calculate the intersection point using parametric equation of the line
-            float t = ((sliceStart.x - start.x) * (sliceStart.y - sliceEnd.y) - (sliceStart.y - start.y) * (sliceStart.x - sliceEnd.x)) / ((start.x - end.x) * (sliceStart.y - sliceEnd.y) - (start.y - end.y) * (sliceStart.x - sliceEnd.x));
+            // Parametric intersection calculation in 2D
+            float t = ((sliceStart.x - start2D.x) * (sliceStart.y - sliceEnd.y) - (sliceStart.y - start2D.y) * (sliceStart.x - sliceEnd.x)) / 
+                    ((start2D.x - end2D.x) * (sliceStart.y - sliceEnd.y) - (start2D.y - end2D.y) * (sliceStart.x - sliceEnd.x));
 
-            // Calculate intersection point along the edge
-            return start + t * (end - start);
+            // Calculate the intersection point along the edge in 2D
+            Vector2 intersection2D = start2D + t * (end2D - start2D);
+
+            // Return as a Vector3, preserving the Z component
+            return new Vector3(intersection2D.x, intersection2D.y, start.z);
         }
         
         void AddTriangleToMesh(Vector3 v0, Vector3 v1, Vector3 v2, List<Vector3> vertices, List<int> triangles)

@@ -70,3 +70,18 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /Player v Player Game/[Aa]ssets/[Ss]treamingAssets/aa.meta
 /Player v Player Game/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Don't ship debug information (may contain sensitive data)
+/Player v Player Game_BurstDebugInformation_DoNotShip/*
+
+# Exclude Unity build data 
+/MonoBleedingEdge/
+/Player v Player Game_Data/
+
+# Compiled binaries
+*.exe
+*.dll
+
+# OS-specific files
+.DS_Store
+Thumbs.db
